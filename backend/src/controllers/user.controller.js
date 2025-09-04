@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Role from "../models/Role.js";
+import bcrypt from "bcryptjs";
 
 export async function getAllUsers(_, res) {
     try {
@@ -35,15 +37,21 @@ export async function getUserById(req, res) {
 
 export async function createUser(req, res) {
     try {
-        const { user_name, user_email, user_phone, user_password, role_id, branch_id } = req.body;
+        const { user_name, user_email, user_phone, user_password, branch_id } = req.body;
+
+        const defaultRole = await Role.findOne({ role_name: "user" });
+
+        if (!defaultRole) {
+            return res.status(500).json({ message: "Default role not found" });
+        }
 
         const newUser = new User({
             user_name,
             user_email,
             user_phone,
             user_password,
-            role_id,
-            branch_id
+            branch_id,
+            role_id: defaultRole._id
         });
 
         const savedUser = await newUser.save();
@@ -90,6 +98,35 @@ export async function deleteUser(req, res) {
     } catch (error) {
         console.error("Error deleting user: ", error);
 
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function loginUser(req, res) {
+    try {
+        const { user_email, user_password } = req.body;
+
+        const user = await User.findOne({ user_email });
+
+        if (!user) {
+            return res.status(404).json({ message: "Kullanıcı bulunamadı." });
+        }
+
+        const isMatch = await bcrypt.compare(user_password, user.user_password);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: "Geçersiz şifre." });
+        }
+
+        res.status(200).json({
+            _id: user._id,
+            user_name: user.user_name,
+            user_email: user.user_email
+        });
+
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
