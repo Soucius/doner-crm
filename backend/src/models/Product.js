@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema({
     },
     product_image: {
         type: String,
-        required: true,
+        default: ""
     },
     product_is_active: {
         type: Boolean,

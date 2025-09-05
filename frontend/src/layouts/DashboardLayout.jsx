@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { Menu } from "lucide-react";
 
@@ -30,7 +30,20 @@ const DashboardLayout = () => {
 
       <div className="flex-1 flex flex-col">
         <header className="flex justify-between items-center p-4 bg-white shadow-md lg:hidden">
-          <div className="text-xl font-bold">Dashboard</div>
+          <div className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
+              <img
+                src="/doner-crm-icon.png"
+                alt="Döner CRM"
+                className="h-10 w-10"
+              />
+
+              <div className="text-xl font-bold">
+                Döner<span className="text-red-600">CRM</span>
+              </div>
+            </Link>
+          </div>
+
           <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
             <Menu size={28} />
           </button>

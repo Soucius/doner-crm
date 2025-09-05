@@ -1,8 +1,27 @@
 import Product from "../models/Product.js";
+import cloudinary from "cloudinary";
 
-export async function getAllProducts(_, res) {
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+export async function getAllProducts(req, res) {
     try {
-        const products = await Product.find().sort({ createdAt: -1 }).populate("categories");
+        const { search, category } = req.query;
+
+        const filter = {};
+
+        if (search) {
+            filter.product_name = { $regex: search, $options: "i"  };
+        }
+
+        if (category) {
+            filter.categories = category;
+        }
+
+        const products = await Product.find(filter).sort({ createdAt: -1 }).populate("categories");
 
         res.status(200).json(products);
     } catch (error) {
@@ -30,16 +49,20 @@ export async function getProductById(req, res) {
 
 export async function createProduct(req, res) {
     try {
-        const { product_name, product_description, product_price, product_stock, product_image, product_is_active, categories } = req.body;
+        let imageUrl = "";
+
+        if (req.file) {
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const result = await cloudinary.v2.uploader.upload(dataURI, {
+                folder: "products"
+            });
+            imageUrl =  result.secure_url;
+        }
 
         const newProduct = new Product({
-            product_name,
-            product_description,
-            product_price,
-            product_stock,
-            product_image,
-            product_is_active,
-            categories
+            ...req.body,
+            product_image: imageUrl
         });
 
         const savedProduct = await newProduct.save();
@@ -54,19 +77,21 @@ export async function createProduct(req, res) {
 
 export async function updateProduct(req, res) {
     try {
-        const { product_name, product_description, product_price, product_stock, product_image, product_is_active } = req.body;
+        const updateData = { ...req.body };
+
+        if (req.file) {
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const result = await cloudinary.v2.uploader.upload(dataURI, {
+                folder: "products"
+            });
+            updateData.product_image = result.secure_url;
+        }
 
         const updatedProduct = await Product.findByIdAndUpdate(
-            req.params.id,
-            {
-                product_name,
-                product_description,
-                product_price,
-                product_stock,
-                product_image,
-                product_is_active
-            },
-            { new: true }
+            req.params.productId,
+            updateData,
+            { new: true, runValidators: true }
         );
 
         if (!updatedProduct) {
@@ -93,6 +118,23 @@ export async function deleteProduct(req, res) {
     } catch (error) {
         console.error("Error deleting product: ", error);
 
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function deleteMultipleProducts(req, res) {
+    try {
+        const { ids } = req.body;
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: "Lütfen silinecek ürün ID'lerini sağlayın." });
+        }
+
+        const result = await Product.deleteMany({ _id: { $in: ids } });
+
+        res.status(200).json({ message: `${result.deletedCount} ürün başarıyla silindi.` });
+    } catch (error) {
+        console.error("Error deleting multiple products: ", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 }

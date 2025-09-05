@@ -1,6 +1,6 @@
+import dotenv from "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes.js";
 import branchRoutes from "./routes/branch.routes.js";
 import roleRoutes from "./routes/role.routes.js";
@@ -10,7 +10,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import { connectDB } from "./config/db.js";
 
-dotenv.config();
+// dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;

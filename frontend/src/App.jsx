@@ -12,6 +12,8 @@ import ScrollToTopButton from "./components/ScrollToTopButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
+import ProductAddPage from "./pages/ProductAddPage";
+import ProductEditPage from "./pages/ProductEditPage";
 
 function App() {
   return (
@@ -53,6 +55,11 @@ function App() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="products/new" element={<ProductAddPage />} />
+          <Route
+            path="products/edit/:productId"
+            element={<ProductEditPage />}
+          />
           <Route path="branches" element={<BranchesPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="my-account" element={<MyAccountPage />} />

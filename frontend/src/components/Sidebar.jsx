@@ -5,7 +5,6 @@ import {
   Building,
   Users,
   UserCircle,
-  Beef,
   LogOut,
 } from "lucide-react";
 
@@ -36,7 +35,9 @@ const Sidebar = ({ isSidebarOpen, closeSidebar, handleLogout }) => {
             className="size-8"
           />
 
-          <span className="text-xl font-bold">DönerCRM</span>
+          <span className="text-xl font-bold">
+            Döner<span className="text-red-400">CRM</span>
+          </span>
         </Link>
       </div>
 
