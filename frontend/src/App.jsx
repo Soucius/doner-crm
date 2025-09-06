@@ -14,6 +14,7 @@ import PublicRoute from "./components/PublicRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProductAddPage from "./pages/ProductAddPage";
 import ProductEditPage from "./pages/ProductEditPage";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
             path="products/edit/:productId"
             element={<ProductEditPage />}
           />
+          <Route path="categories" element={<CategoriesPage />} />
           <Route path="branches" element={<BranchesPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="my-account" element={<MyAccountPage />} />

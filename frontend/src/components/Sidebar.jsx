@@ -6,11 +6,13 @@ import {
   Users,
   UserCircle,
   LogOut,
+  Folder,
 } from "lucide-react";
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Ürünler", path: "/dashboard/products", icon: Package },
+  { name: "Kategoriler", path: "/dashboard/categories", icon: Folder },
   { name: "Şubeler", path: "/dashboard/branches", icon: Building },
   { name: "Kullanıcılar", path: "/dashboard/users", icon: Users },
   { name: "Hesabım", path: "/dashboard/my-account", icon: UserCircle },
