@@ -32,7 +32,8 @@ const SigninPage = () => {
 
       toast.success("Giriş başarılı! Yönlendiriliyorsunuz...");
 
-      localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       setTimeout(() => {
         navigate("/dashboard");

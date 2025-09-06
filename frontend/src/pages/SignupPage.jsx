@@ -77,7 +77,8 @@ const SignupPage = () => {
 
       toast.success("Kayıt başarıyla tamamlandı! Giriş yapılıyor...");
 
-      localStorage.setItem("user", JSON.stringify(users.data));
+      localStorage.setItem("token", users.data.token);
+      localStorage.setItem("user", JSON.stringify(users.data.user));
 
       setTimeout(() => {
         navigate("/dashboard");

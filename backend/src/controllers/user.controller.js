@@ -1,6 +1,13 @@
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: "7d"
+    });
+};
 
 export async function getAllUsers(_, res) {
     try {
@@ -55,8 +62,9 @@ export async function createUser(req, res) {
         });
 
         const savedUser = await newUser.save();
+        const token = generateToken(savedUser._id);
 
-        res.status(201).json(savedUser);
+        res.status(201).json({ token, user: savedUser });
     } catch (error) {
         console.error("Error creating user: ", error);
         
@@ -118,11 +126,13 @@ export async function loginUser(req, res) {
             return res.status(400).json({ message: "Geçersiz şifre." });
         }
 
-        res.status(200).json({
+        const token = generateToken(user._id);
+
+        res.status(200).json({token, user: {
             _id: user._id,
             user_name: user.user_name,
             user_email: user.user_email
-        });
+        }});
 
     } catch (error) {
         console.error("Error logging in user:", error);
