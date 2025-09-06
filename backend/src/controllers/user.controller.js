@@ -9,14 +9,17 @@ const generateToken = (id) => {
     });
 };
 
-export async function getAllUsers(_, res) {
+export async function getAllUsers(req, res) {
     try {
-        const users = await User.find().sort({ createdAt: -1 }).populate("branch_id").populate({
-            path: "role_id",
-            populate: {
-                path: "permissions"
-            }
-        });
+        const { unassigned } = req.query;
+
+        const filter = {};
+
+        if (unassigned === 'true') {
+            filter.branch_id = null;
+        }
+        
+        const users = await User.find(filter).select('-user_password');
 
         res.status(200).json(users);
     } catch (error) {
@@ -46,6 +49,10 @@ export async function createUser(req, res) {
     try {
         const { user_name, user_email, user_phone, user_password, branch_id } = req.body;
 
+        if (!branch_id) {
+            return res.status(400).json({ message: "Lütfen geçerli bir şube seçin." });
+        }
+
         const defaultRole = await Role.findOne({ role_name: "user" });
 
         if (!defaultRole) {
@@ -68,6 +75,13 @@ export async function createUser(req, res) {
     } catch (error) {
         console.error("Error creating user: ", error);
         
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: error.message });
+        }
+        
+        if (error.code === 11000) {
+            return res.status(400).json({ message: "Bu e-posta veya telefon numarası zaten kayıtlı."})
+        }
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
@@ -89,6 +103,25 @@ export async function updateUser(req, res) {
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error("Error updating user: ", error);
+
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export async function updateUserBranch(req, res) {
+    try {
+        const { userId } = req.params;
+        const { branchId } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { branch_id: branchId }, 
+            { new: true }
+        );
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error updating user branch: ", error);
 
         res.status(500).json({ message: "Internal Server Error" });
     }

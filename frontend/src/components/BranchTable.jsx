@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import { Link } from "react-router";
 
 const BranchTable = ({ branches, onEdit, onDelete }) => (
   <div className="bg-white shadow-md rounded-lg overflow-x-auto">
@@ -6,7 +7,7 @@ const BranchTable = ({ branches, onEdit, onDelete }) => (
       <thead className="bg-gray-100">
         <tr>
           <th className="p-3 text-left">Şube Adı</th>
-          <th className="p-3 text-left">Lokasyon</th>
+          <th className="p-3 text-left">Adres</th>
           <th className="p-3 text-left">Telefon</th>
           <th className="p-3 text-left">Durum</th>
           <th className="p-3 text-center">Eylemler</th>
@@ -17,7 +18,12 @@ const BranchTable = ({ branches, onEdit, onDelete }) => (
         {branches.map((branch) => (
           <tr key={branch._id} className="border-b hover:bg-gray-50">
             <td className="p-3 align-middle font-medium">
-              {branch.branch_name}
+              <Link
+                to={`/dashboard/branches/${branch._id}`}
+                className="hover:underline"
+              >
+                {branch.branch_name}
+              </Link>
             </td>
 
             <td className="p-3 align-middle">{branch.branch_address}</td>

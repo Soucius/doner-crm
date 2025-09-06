@@ -4,7 +4,7 @@ import protect from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", protect, getAllBranches);
+router.get("/", getAllBranches);
 router.get("/:id", protect, getBranchById);
 router.post("/", protect, createBranch);
 router.put("/:id", protect, updateBranch);

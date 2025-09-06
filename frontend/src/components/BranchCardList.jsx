@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import { Link } from "react-router";
 
 const BranchCardList = ({ branches, onEdit, onDelete }) => (
   <div className="space-y-4">
@@ -6,7 +7,14 @@ const BranchCardList = ({ branches, onEdit, onDelete }) => (
       <div key={branch._id} className="bg-white shadow-md rounded-lg p-4">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-bold text-lg">{branch.branch_name}</h3>
+            <h3 className="font-bold text-lg">
+              <Link
+                to={`/dashboard/branches/${branch._id}`}
+                className="hover:underline"
+              >
+                {branch.branch_name}
+              </Link>
+            </h3>
 
             <p className="text-sm text-gray-500">{branch.branch_address}</p>
 

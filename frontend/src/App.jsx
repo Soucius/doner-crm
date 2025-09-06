@@ -15,6 +15,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import ProductAddPage from "./pages/ProductAddPage";
 import ProductEditPage from "./pages/ProductEditPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import BranchDetailPage from "./pages/BranchDetailPage";
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
           />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="branches" element={<BranchesPage />} />
+          <Route path="branches/:branchId" element={<BranchDetailPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="my-account" element={<MyAccountPage />} />
         </Route>

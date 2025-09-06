@@ -1,4 +1,5 @@
 import Branch from "../models/Branch.js";
+import mongoose from "mongoose";
 
 export async function getAllBranches(_, res) {
     try {
@@ -30,13 +31,27 @@ export async function getAllBranches(_, res) {
 
 export async function getBranchById(req, res) {
     try {
-        const branch = await Branch.findById(req.params.id);
+        const branchId = req.params.id;
 
-        if (!branch) {
+        const pipeline = [
+            { $match: { _id: new mongoose.Types.ObjectId(branchId) } },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: 'branch_id',
+                    as: 'users'
+                }
+            }
+        ];
+
+        const result = await Branch.aggregate(pipeline);
+
+        if (result.length === 0) {
             return res.status(404).json({ message: "Branch not found" });
         }
-
-        res.status(200).json(branch);
+        
+        res.status(200).json(result[0]);
     } catch (error) {
         console.error("Error fetching branch: ", error);
         
