@@ -11,15 +11,32 @@ const generateToken = (id) => {
 
 export async function getAllUsers(req, res) {
     try {
-        const { unassigned } = req.query;
+        const { search, role, branch } = req.query;
 
         const filter = {};
 
-        if (unassigned === 'true') {
-            filter.branch_id = null;
+        if (search) {
+            const regex = new RegExp(search, 'i');
+
+            filter.$or = [
+                { user_name: regex },
+                { user_email: regex }
+            ];
         }
-        
-        const users = await User.find(filter).select('-user_password');
+
+        if (role) {
+            filter.role_id = role;
+        }
+
+        if (branch) {
+            filter.branch_id = branch;
+        }
+
+        const users = await User.find(filter)
+            .populate('role_id', 'role_name')
+            .populate('branch_id', 'branch_name')
+            .select('-user_password')
+            .sort({ createdAt: -1 });
 
         res.status(200).json(users);
     } catch (error) {
@@ -88,13 +105,21 @@ export async function createUser(req, res) {
 
 export async function updateUser(req, res) {
     try {
-        const { user_name, user_email, user_phone, user_password, user_role, branch_id } = req.body;
+        const userId = req.params.id;
+        const updateData = req.body;
+
+        if (updateData.user_password && updateData.user_password !== '') {
+            const salt = await bcrypt.genSalt(10);
+            updateData.user_password = await bcrypt.hash(updateData.user_password, salt);
+        } else {
+            delete updateData.user_password;
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            { user_name, user_email, user_phone, user_password, user_role, branch_id },
-            { new: true }
-        );
+            userId,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-user_password');
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
