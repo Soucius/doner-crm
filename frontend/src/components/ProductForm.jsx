@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../lib/axios.js";
 import toast from "react-hot-toast";
-import { Link } from "react-router";
+import { Plus, Trash2 } from "lucide-react";
 
 const initialFormState = {
   product_name: "",
@@ -11,26 +11,53 @@ const initialFormState = {
   product_image: null,
   product_is_active: false,
   categories: [],
+  ingredients: [],
 };
 
 const ProductForm = ({ initialData = null, onSubmit, isLoading }) => {
   const [formData, setFormData] = useState(initialFormState);
   const [allCategories, setAllCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState("");
+  const [allIngredients, setAllIngredients] = useState([]);
+  const [allUnits, setAllUnits] = useState([]);
 
   useEffect(() => {
-    api
-      .get("/categories")
-      .then((res) => setAllCategories(res.data))
-      .catch((err) => toast.error(err.message));
+    const fetchDropdownData = async () => {
+      try {
+        const [categoriesRes, ingredientsRes, unitsRes] = await Promise.all([
+          api.get("/categories"),
+          api.get("/ingredients"),
+          api.get("/units"),
+        ]);
+
+        setAllCategories(categoriesRes.data);
+        setAllIngredients(ingredientsRes.data);
+        setAllUnits(unitsRes.data);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    fetchDropdownData();
   }, []);
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        ...initialData,
-        categories: initialData.categories.map((category) => category._id),
+        product_name: initialData.product_name || "",
+        product_description: initialData.product_description || "",
+        product_price: initialData.product_price || 0,
+        product_stock: initialData.product_stock || 0,
         product_image: null,
+        product_is_active: initialData.product_is_active || false,
+        categories: initialData.categories.map(
+          (category) => category._id || category
+        ),
+        ingredients: initialData.ingredients.map((ing) => ({
+          ingredient: ing.ingredient?._id || "",
+          amount: ing.amount || 0,
+          unit: ing.unit?._id || "",
+        })),
       });
 
       setImagePreview(initialData.product_image || "");
@@ -73,24 +100,54 @@ const ProductForm = ({ initialData = null, onSubmit, isLoading }) => {
     });
   };
 
+  const handleIngredientChange = (index, field, value) => {
+    const updatedIngredients = formData.ingredients.map((ing, i) =>
+      i === index ? { ...ing, [field]: value } : ing
+    );
+
+    setFormData((prev) => ({ ...prev, ingredients: updatedIngredients }));
+  };
+
+  const addIngredient = () => {
+    setFormData((prev) => ({
+      ...prev,
+      ingredients: [
+        ...prev.ingredients,
+        { ingredient: "", amount: 0, unit: "" },
+      ],
+    }));
+  };
+
+  const removeIngredient = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      ingredients: prev.ingredients.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const data = new FormData();
+    const validIngredients = formData.ingredients.filter(
+      (ing) => ing.ingredient && ing.unit && Number(ing.amount) > 0
+    );
 
-    data.append("product_name", formData.product_name);
-    data.append("product_description", formData.product_description);
-    data.append("product_price", formData.product_price);
-    data.append("product_stock", formData.product_stock);
-    data.append("product_is_active", formData.product_is_active);
-
-    formData.categories.forEach((catId) => {
-      data.append("categories", catId);
+    Object.keys(formData).forEach((key) => {
+      if (key === "categories") {
+        formData.categories.forEach((catId) =>
+          data.append("categories", catId)
+        );
+      } else if (key === "ingredients") {
+        if (validIngredients.length > 0) {
+          data.append("ingredients", JSON.stringify(validIngredients));
+        }
+      } else if (key === "product_image" && formData.product_image) {
+        data.append("product_image", formData.product_image);
+      } else if (key !== "product_image") {
+        data.append(key, formData[key]);
+      }
     });
-
-    if (formData.product_image) {
-      data.append("product_image", formData.product_image);
-    }
 
     onSubmit(data);
   };
@@ -98,7 +155,7 @@ const ProductForm = ({ initialData = null, onSubmit, isLoading }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-lg shadow-md"
+      className="space-y-6 bg-white p-6 rounded-lg shadow-md"
     >
       <div>
         <label className="block text-gray-700 font-medium">Ürün Adı</label>
@@ -225,13 +282,90 @@ const ProductForm = ({ initialData = null, onSubmit, isLoading }) => {
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 pt-4">
-        <Link
-          to="/dashboard/products"
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+      <div className="pt-4 border-t">
+        <label className="block text-gray-700 font-medium mb-2">
+          Ürün İçerikleri
+        </label>
+        <div className="space-y-3">
+          {formData.ingredients.map((ing, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-[1fr,auto,auto,auto] gap-2 items-center"
+            >
+              <select
+                value={ing.ingredient}
+                onChange={(e) =>
+                  handleIngredientChange(index, "ingredient", e.target.value)
+                }
+                className="w-full p-2 border rounded bg-white"
+              >
+                <option value="" disabled>
+                  Malzeme Seçin
+                </option>
+
+                {allIngredients.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.ingredient_name}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                type="number"
+                placeholder="Miktar"
+                value={ing.amount}
+                onChange={(e) =>
+                  handleIngredientChange(index, "amount", e.target.value)
+                }
+                className="w-24 py-1.5 px-2 border rounded"
+              />
+
+              <select
+                value={ing.unit}
+                onChange={(e) =>
+                  handleIngredientChange(index, "unit", e.target.value)
+                }
+                className="w-28 p-2 border rounded bg-white"
+              >
+                <option value="" disabled>
+                  Birim
+                </option>
+
+                {allUnits.map((unit) => (
+                  <option key={unit._id} value={unit._id}>
+                    {unit.abbreviation}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={() => removeIngredient(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={addIngredient}
+          className="mt-3 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800"
+        >
+          <Plus size={16} /> İçerik Ekle
+        </button>
+      </div>
+
+      <div className="flex justify-end gap-4 pt-4 border-t">
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="px-6 py-2 bg-gray-100 rounded"
         >
           İptal
-        </Link>
+        </button>
 
         <button
           type="submit"

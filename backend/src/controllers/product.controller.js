@@ -33,7 +33,13 @@ export async function getAllProducts(req, res) {
 
 export async function getProductById(req, res) {
     try {
-        const product = await Product.findById(req.params.id).populate("categories");
+        const product = await Product.findById(req.params.id).populate("categories").populate({
+            path: "ingredients.ingredient",
+            model: "Ingredient"            
+        }).populate({
+            path: "ingredients.unit",
+            model: "Unit"
+        });
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
@@ -49,6 +55,12 @@ export async function getProductById(req, res) {
 
 export async function createProduct(req, res) {
     try {
+        if (req.body.ingredients) {
+            const ingredientsData = Array.isArray(req.body.ingredients) ? req.body.ingredients[0] : req.body.ingredients;
+
+            req.body.ingredients = JSON.parse(ingredientsData);
+        }
+
         let imageUrl = "";
 
         if (req.file) {
@@ -78,6 +90,12 @@ export async function createProduct(req, res) {
 export async function updateProduct(req, res) {
     try {
         const updateData = { ...req.body };
+
+        if (updateData.ingredients) {
+            const ingredientsData = Array.isArray(updateData.ingredients) ? updateData.ingredients[0] : updateData.ingredients;
+
+            updateData.ingredients = JSON.parse(ingredientsData);
+        }
 
         if (req.file) {
             const b64 = Buffer.from(req.file.buffer).toString("base64");

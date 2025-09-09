@@ -7,11 +7,15 @@ import {
   UserCircle,
   LogOut,
   Folder,
+  Beaker,
+  ClipboardList,
 } from "lucide-react";
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Ürünler", path: "/dashboard/products", icon: Package },
+  { name: "Malzemeler", path: "/dashboard/ingredients", icon: Beaker },
+  { name: "Birimler", path: "/dashboard/units", icon: ClipboardList },
   { name: "Kategoriler", path: "/dashboard/categories", icon: Folder },
   { name: "Şubeler", path: "/dashboard/branches", icon: Building },
   { name: "Kullanıcılar", path: "/dashboard/users", icon: Users },

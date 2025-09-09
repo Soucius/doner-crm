@@ -25,6 +25,24 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+
+    ingredients: [{
+        ingredient: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Ingredient',
+            required: true,
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        unit: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Unit',
+            required: true,
+        }
+    }],
+
     categories: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category"
