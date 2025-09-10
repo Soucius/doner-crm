@@ -10,6 +10,7 @@ import {
   Beaker,
   ClipboardList,
   ShoppingCart,
+  History,
 } from "lucide-react";
 
 const menuItems = [
@@ -20,6 +21,7 @@ const menuItems = [
   { name: "Birimler", path: "/dashboard/units", icon: ClipboardList },
   { name: "Kategoriler", path: "/dashboard/categories", icon: Folder },
   { name: "Şubeler", path: "/dashboard/branches", icon: Building },
+  { name: "Satışlar", path: "/dashboard/sales", icon: History },
   { name: "Kullanıcılar", path: "/dashboard/users", icon: Users },
   { name: "Hesabım", path: "/dashboard/my-account", icon: UserCircle },
 ];

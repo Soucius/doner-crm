@@ -19,6 +19,8 @@ import BranchDetailPage from "./pages/BranchDetailPage";
 import IngredientsPage from "./pages/IngredientsPage";
 import UnitsPage from "./pages/UnitsPage";
 import POSPage from "./pages/POSPage";
+import SaleDetailPage from "./pages/SaleDetailPage";
+import SalesPage from "./pages/SalesPage";
 
 function App() {
   return (
@@ -69,6 +71,8 @@ function App() {
           <Route path="ingredients" element={<IngredientsPage />} />
           <Route path="units" element={<UnitsPage />} />
           <Route path="pos" element={<POSPage />} />
+          <Route path="sales" element={<SalesPage />} />
+          <Route path="sales/:id" element={<SaleDetailPage />} />
           <Route path="branches" element={<BranchesPage />} />
           <Route path="branches/:branchId" element={<BranchDetailPage />} />
           <Route path="users" element={<UsersPage />} />

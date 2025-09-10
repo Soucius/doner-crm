@@ -30,7 +30,7 @@ const CheckoutModal = ({ isOpen, onClose, subtotal, onCheckout }) => {
         <div className="space-y-4">
           <div className="flex justify-between text-lg">
             <span>Ara Toplam:</span>
-            <span className="font-semibold">{subtotal.toFixed(2)} TL</span>
+            <span className="font-semibold">{subtotal.toFixed(2)}TL</span>
           </div>
 
           <div>
@@ -76,7 +76,7 @@ const CheckoutModal = ({ isOpen, onClose, subtotal, onCheckout }) => {
           <div className="border-t pt-4 mt-4 flex justify-between text-2xl font-bold">
             <span>GENEL TOPLAM:</span>
 
-            <span className="text-green-600">{finalTotal.toFixed(2)} TL</span>
+            <span className="text-green-600">{finalTotal.toFixed(2)}TL</span>
           </div>
 
           <button

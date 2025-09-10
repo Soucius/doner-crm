@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../lib/axios";
 import toast from "react-hot-toast";
 import ProductCard from "../components/ProductCard";
@@ -18,26 +18,27 @@ const POSPage = () => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [lastSale, setLastSale] = useState(null);
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      setIsLoading(true);
-
-      try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          api.get("/products?pos=true"),
-          api.get("/categories"),
-        ]);
-        setProducts(productsRes.data);
-        setFilteredProducts(productsRes.data);
-        setCategories(categoriesRes.data);
-      } catch (error) {
-        toast.error(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchInitialData();
+  const fetchPOSData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        api.get("/products?pos=true"),
+        api.get("/categories"),
+      ]);
+      setProducts(productsRes.data);
+      setFilteredProducts(productsRes.data);
+      setCategories(categoriesRes.data);
+      setSelectedCategory("all");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPOSData();
+  }, [fetchPOSData]);
 
   const handleCategoryFilter = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -56,6 +57,7 @@ const POSPage = () => {
       const existingItem = prevCart.find(
         (item) => item.product === product._id
       );
+
       if (existingItem) {
         return prevCart.map((item) =>
           item.product === product._id
@@ -127,7 +129,18 @@ const POSPage = () => {
       loading: "Satış kaydediliyor...",
       success: (res) => {
         setIsCheckoutOpen(false);
-        setLastSale(res.data);
+        setLastSale(res.data.sale);
+
+        if (res.data.lowStockAlerts && res.data.lowStockAlerts.length > 0) {
+          setTimeout(() => {
+            res.data.lowStockAlerts.forEach((productName) => {
+              toast(`Dikkat: "${productName}" stoğu azalıyor!`, {
+                icon: "⚠️",
+                duration: 5000,
+              });
+            });
+          }, 1000);
+        }
 
         return "Satış başarıyla tamamlandı!";
       },
@@ -138,6 +151,7 @@ const POSPage = () => {
   const handleCloseReceipt = () => {
     setLastSale(null);
     setCart([]);
+    fetchPOSData();
   };
 
   useEffect(() => {
