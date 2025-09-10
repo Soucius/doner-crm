@@ -9,7 +9,7 @@ cloudinary.v2.config({
 
 export async function getAllProducts(req, res) {
     try {
-        const { search, category } = req.query;
+        const { search, category, pos } = req.query;
 
         const filter = {};
 
@@ -19,6 +19,11 @@ export async function getAllProducts(req, res) {
 
         if (category) {
             filter.categories = category;
+        }
+
+        if (pos === 'true') {
+            filter.product_is_active = true;
+            filter.product_stock = { $gt: 0 };
         }
 
         const products = await Product.find(filter).sort({ createdAt: -1 }).populate("categories");

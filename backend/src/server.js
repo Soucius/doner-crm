@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import ingredientRoutes from "./routes/ingredient.routes.js";
 import unitRoutes from "./routes/unit.routes.js";
+import saleRoutes from './routes/sale.routes.js';
 import { connectDB } from "./config/db.js";
 
 // dotenv.config();
@@ -33,6 +34,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/ingredients", ingredientRoutes);
 app.use("/api/units", unitRoutes);
+app.use('/api/sales', saleRoutes);
 
 connectDB().then(() => {
     app.listen(PORT, () => {

@@ -18,6 +18,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import BranchDetailPage from "./pages/BranchDetailPage";
 import IngredientsPage from "./pages/IngredientsPage";
 import UnitsPage from "./pages/UnitsPage";
+import POSPage from "./pages/POSPage";
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="ingredients" element={<IngredientsPage />} />
           <Route path="units" element={<UnitsPage />} />
+          <Route path="pos" element={<POSPage />} />
           <Route path="branches" element={<BranchesPage />} />
           <Route path="branches/:branchId" element={<BranchDetailPage />} />
           <Route path="users" element={<UsersPage />} />

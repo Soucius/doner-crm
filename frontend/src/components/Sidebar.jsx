@@ -9,9 +9,11 @@ import {
   Folder,
   Beaker,
   ClipboardList,
+  ShoppingCart,
 } from "lucide-react";
 
 const menuItems = [
+  { name: "POS", path: "/dashboard/pos", icon: ShoppingCart },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Ürünler", path: "/dashboard/products", icon: Package },
   { name: "Malzemeler", path: "/dashboard/ingredients", icon: Beaker },
