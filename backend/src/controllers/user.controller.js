@@ -70,7 +70,7 @@ export async function createUser(req, res) {
             return res.status(400).json({ message: "Lütfen geçerli bir şube seçin." });
         }
 
-        const defaultRole = await Role.findOne({ role_name: "user" });
+        const defaultRole = await Role.findOne({ role_name: "Kasiyer" });
 
         if (!defaultRole) {
             return res.status(500).json({ message: "Default role not found" });
