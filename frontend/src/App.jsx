@@ -21,7 +21,7 @@ import UnitsPage from "./pages/UnitsPage";
 import POSPage from "./pages/POSPage";
 import SaleDetailPage from "./pages/SaleDetailPage";
 import SalesPage from "./pages/SalesPage";
-
+asdasd
 function App() {
   return (
     <div className="h-screen w-full bg-gray-100 font-montserrat">
